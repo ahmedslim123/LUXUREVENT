@@ -2,6 +2,11 @@
 #include <QSqlQuery>
 #include<QtDebug>
 #include<QObject>
+#include <QByteArray>
+#include<map>
+#include<QSqlRecord>
+#include <QFile>
+
 Sponsor::Sponsor()
 {
      ID=0;
@@ -73,7 +78,8 @@ bool Sponsor::Ajouter()
 
     QSqlQuery query;
     QString id_string= QString::number(ID);
-          query.prepare("INSERT INTO SPONSOR(ID, NOM_SOCIETE, ADRESSE_MAIL, NUMERO_TLF, SITE_WEB, TARIF)"
+
+          query.prepare("INSERT INTO SPONSOR(ID, NOM_SOCIETE, ADRESSE_MAIL, NUMERO_TLF, SITE_WEB, TARIF )"
                         "VALUES (:ID, :nom_societe,  :adresse, :tlf, :site, :tarif)");
           query.bindValue(":ID", id_string);
           query.bindValue(":nom_societe", nom_societe);
@@ -81,13 +87,15 @@ bool Sponsor::Ajouter()
           query.bindValue(":tlf", tlf);
           query.bindValue(":site", site);
           query.bindValue(":tarif", tarif);
+
          return query.exec();
 }
+
 
 bool Sponsor::modifier(){
     QSqlQuery query;
     QString id_string= QString::number(ID);
-    query.prepare("UPDATE EMPLOYEE SET ID= :ID, NOM_SOCIETE= :NOM_SOCIETE, ADRESSE_MAIL= :ADRESSE_MAIL, NUMERO_TLF= :NUMERO_TLF, SITE_WEB= :SITE_WEB, TARIF= :TARIF WHERE ID= :ID");
+    query.prepare("UPDATE sponsor SET ID= :ID, NOM_SOCIETE= :NOM_SOCIETE, ADRESSE_MAIL= :ADRESSE_MAIL, NUMERO_TLF= :NUMERO_TLF, SITE_WEB= :SITE_WEB, TARIF= :TARIF WHERE ID= :ID");
     query.bindValue(":ID",id_string);
     query.bindValue(":NOM_SOCIETE",nom_societe);
     query.bindValue(":ADRESSE_MAIL",adresse);
@@ -122,3 +130,73 @@ bool Sponsor::supprimer(int id)
 
          return query.exec();
 }
+
+bool Sponsor::RechercheSponsorParID(int IDrecherche)
+{
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM sponsor WHERE id=:IDrecherche");
+    query.bindValue(":IDrecherche",IDrecherche);
+    query.exec();
+    if (!query.first()){
+        return false;
+    }
+    else
+    {
+        int nID = query.record().indexOf("ID");
+        int nNom=query.record().indexOf("NOM_SOCIETE");
+        int nMail=query.record().indexOf("ADRESSE_MAIL");
+        int nTlf=query.record().indexOf("NUMERO_TLF");
+        int nSite=query.record().indexOf("SITE_WEB");
+        int nTarif=query.record().indexOf("TARIF");
+
+        ID=query.value(nID).toInt();
+        nom_societe=query.value(nNom).toString();
+        adresse=query.value(nMail).toString();
+        tlf=query.value(nTlf).toInt();
+        site=query.value(nSite).toString();
+        tarif=query.value(nTarif).toInt();
+
+        return true;
+    }
+
+}
+
+QSqlQueryModel * Sponsor::tri_ID()
+{
+    QSqlQueryModel *model= new QSqlQueryModel;
+    QSqlQuery *q=new QSqlQuery();
+    q->prepare("select * from sponsor order by id  asc");
+    q->exec();
+    model->setQuery(*q);
+    return  model;
+}
+
+QSqlQueryModel * Sponsor::tri_nom()
+{
+    QSqlQueryModel *model= new QSqlQueryModel;
+    QSqlQuery *q=new QSqlQuery();
+    q->prepare("select * from sponsor order by NOM_SOCIETE  asc");
+    q->exec();
+    model->setQuery(*q);
+    return  model;
+}
+QSqlQueryModel * Sponsor::tri_tlf()
+{
+    QSqlQueryModel *model= new QSqlQueryModel;
+    QSqlQuery *q=new QSqlQuery();
+    q->prepare("select * from sponsor order by NUMERO_TLF  asc");
+    q->exec();
+    model->setQuery(*q);
+    return  model;
+}
+QSqlQueryModel * Sponsor::tri_tarif()
+{
+    QSqlQueryModel *model= new QSqlQueryModel;
+    QSqlQuery *q=new QSqlQuery();
+    q->prepare("select * from sponsor order by TARIF  asc");
+    q->exec();
+    model->setQuery(*q);
+    return  model;
+}
+

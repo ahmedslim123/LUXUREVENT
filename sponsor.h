@@ -2,6 +2,8 @@
 #define SPONSOR_H
 #include <QString>
 #include <QSqlQueryModel>
+#include <QImage>
+
 
 
 class Sponsor
@@ -25,6 +27,13 @@ public:
     bool modifier();
     QSqlQueryModel* afficher();
     bool supprimer(int);
+    bool RechercheSponsorParID(int IDrecherche);
+    QSqlQueryModel *tri_ID();
+    QSqlQueryModel *tri_nom();
+    QSqlQueryModel *tri_tlf();
+    QSqlQueryModel *tri_tarif();
+    QSqlQueryModel * stat();
+    QImage GetPhoto(QString filePath);
 
 
 private:
@@ -34,6 +43,7 @@ private:
     int tarif;
     int tlf;
     QString site;
+
 };
 
 #endif // SPONSOR_H
